@@ -3,12 +3,6 @@ from managers import *
 import utils
 import constants as const
 
-class Game:
-    def __init__(self):
-        self.running = True
-    
-    def _exit(self):
-        self.running = False
 
 def checkFlags():
     pass
@@ -20,12 +14,6 @@ splinters of decaying caskets a tarnished necklace, bearing
 the insignia of a gibbous moon. A faint light seems to shine
 through the grime and verdigris.""")
         flags[0] = False'''
-
-
-def onExit():
-    global running, root
-    running = False
-    root.destroy()
 
 game = utils.Gui()
 

@@ -5,15 +5,15 @@ import constants as c
 class Gui:
     def __init__(self):
         self.root = Tk()
-        self.rsm = ResourceManager()
-        self.csm = CutsceneManager()
+        self.rsm = ResourceManager(self.root)
+        self.csm = CutsceneManager(self.root)
         self.root.title("Bones Incremental")
         self.root.configure(background="black")
         self.root.minsize(c.SCREEN_SIZE[0], c.SCREEN_SIZE[1])
 
         self.root.protocol("WM_DELETE_WINDOW", self.exitGame)
         #checks if anywhere onscreen is clicked, to exit cutscenes
-        #root.bind("<Button-1>", lambda e:csm._killCutscene())
+        self.root.bind("<Button-1>", lambda e:self.csm._endCutscene())
 
         headerFrame = Frame(self.root, width=900, height=30, bg=c.BGC)
         headerFrame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
@@ -75,14 +75,17 @@ class Gui:
 
         self.running = True
 
+        #starts opening cutscene
+        self.csm._createCutscene()
+        self.csm.active = self.csm.cutscenes[0]
+
     def saveGame(self):
         if not self.csm.active:
             print("saved")
 
-    def exitGame(self):
-        if not self.csm.active:        
-            self.root.destroy()
-            self.running = False
+    def exitGame(self):   
+        self.root.destroy()
+        self.running = False
 
     # function to change properties of button on hover
     def changeFgOnHover(self, button, colorOnHover, colorOnLeave):

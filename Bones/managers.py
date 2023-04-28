@@ -7,7 +7,6 @@ class Resource:
         self.name = name
         self.active = True
         self.amount = initAmt
-        #Remember to set parent to ResourceFrame when constructing
         self.label = Label(frame, text=(name + ": " + str(self.amount)),
                            font=c.font, bg=c.BGC, fg=c.FGC)
 
@@ -20,9 +19,10 @@ class Resource:
         self.label.configure(text=(self.name + ": " + str(self.amount)))
 
 class ResourceManager:
-    def __init__(self):
+    def __init__(self, root):
         self.keys = []
         self.resources={}
+        self.root = root
 
     def _addResource(self, resource):
         self.keys.append(resource.name)
@@ -59,19 +59,25 @@ class Cutscene:
         self.text.grid(row=1, column=0, sticky='w',
                        padx=5)
         self.frame.place(x=200, y=100)
+        self.frame.lift()
 
     def _destroy(self):
-        self.frame.destroy()
+        self.frame.place_forget()
 
 class CutsceneManager:
-    def __init__(self):
+    def __init__(self, root):
+        self.root = root
         self.cutscenes = []
         self.flags = []
         self.active = None
+    
+    def _createCutscene(self, title='Title',text="It's a cutscene!"):
+        self.cutscenes.append(Cutscene(title, text))
 
-    def _killCutscene(self):
-        self.active._destroy()
-        self.active = None
+    def _endCutscene(self):
+        if self.active:
+            self.active._destroy()
+            self.active = None
 
 def initResources(rsm, frame):
     bones = Resource("Bones", frame)
