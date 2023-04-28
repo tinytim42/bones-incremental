@@ -16,6 +16,7 @@ class Resource:
 
     def _set_amount(self, amount):
         self.amount = amount
+        self.flarp = 1
         self.label.configure(text=(self.name + ": " + str(self.amount)))
 
 class ResourceManager:
