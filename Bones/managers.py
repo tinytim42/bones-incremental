@@ -31,9 +31,9 @@ class ResourceManager:
     def _addToFrame(self, resource):
         name = resource.name
         self.resources[name].label.grid(row=(self.keys.index(name) + 1),
-                                            column=0,
-                                            sticky='w',
-                                            padx=5)
+                                        column=0,
+                                        sticky='w',
+                                        padx=5)
 
     def _gather(self, resource):
         amt = self.resources[resource]._get_amount()
@@ -70,7 +70,7 @@ class CutsceneManager:
         self.active = None
 
     def _killCutscene(self):
-        self.active.destroy()
+        self.active._destroy()
         self.active = None
 
 def initResources(rsm, frame):
