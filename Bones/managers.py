@@ -3,10 +3,12 @@ from tkinter import *
 import constants as c
 
 class Resource:
-    def __init__(self, name, frame, initAmt=0):
+    def __init__(self, name, frame, initAmt=0, max = 200):
         self.name = name
-        self.active = True
         self.amount = initAmt
+        self.max = max
+        self.unlocked = True
+        self.multiplier = 1
         self.label = Label(frame, text=(name + ": " + str(self.amount)),
                            font=c.font, bg=c.BGC, fg=c.FGC)
 
@@ -23,6 +25,22 @@ class ResourceManager:
         self.keys = []
         self.resources={}
         self.root = root
+        resourceFrame = Frame(self.root, width=200, height=600, bg=c.BGC)
+        resourceFrame.grid(row=1, column=0, padx=5, pady=5)
+        resourceFrame.grid_propagate(0)
+        self.resourceFrame = resourceFrame
+
+        bones = Resource("Bones", self.resourceFrame)
+        sanity = Resource("Sanity", self.resourceFrame, 100)
+        resourceTitle = Label(self.resourceFrame, text="Resources",
+                            bg=c.BGC, fg=c.FGC,
+                            font=c.titleFont)
+        resourceTitle.grid(sticky='w', row=0, column=0,
+                        padx=5, pady=5)
+        self._addResource(bones)
+        self._addResource(sanity)
+        self._addToFrame(bones)
+        self._addToFrame(sanity)
 
     def _addResource(self, resource):
         self.keys.append(resource.name)
@@ -79,23 +97,41 @@ class CutsceneManager:
             self.active._destroy()
             self.active = None
 
-def initResources(rsm, frame):
-    bones = Resource("Bones", frame)
-    sanity = Resource("Sanity", frame, 100)
-    resourceTitle = Label(frame, text="Resources",
-                          bg=c.BGC, fg=c.FGC,
-                          font=c.titleFont)
-    resourceTitle.grid(sticky='w', row=0, column=0,
-                       padx=5, pady=5)
-    rsm._addResource(bones)
-    rsm._addResource(sanity)
-    rsm._addToFrame(bones)
-    rsm._addToFrame(sanity)
+class Log:
+    def __init__(self, frame, text="It's a log!"):
+        self.text = text
+        self.frame = frame
+        self.label = Label(frame, text=self.text, bg=c.BGC,
+                           fg=c.FGC, font=c.font, justify=LEFT,
+                           wraplength=290, padx=5)
+
+class LogManager:
+    def __init__(self,root):
+        self.root = root
+        #stack of all logs to be displayed onscreen
+        self.logStack = []
+        self.frame = Frame(self.root, width=300, height=600, bg=c.BGC)
+        self.frame.grid(row=1, column=2, padx=5, pady=5)
+        self.frame.grid_propagate(0)
+
+        logTitle = Label(self.frame, text="Log", bg=c.BGC,
+                        fg=c.FGC, font=c.titleFont, justify=LEFT)
+        logTitle.grid(sticky='w', row=0, column=0, padx=5, pady=5)
+
+        logItem = Log(self.frame, text="You are alone in an overgrown graveyard.")
+        self.logStack.append(logItem)
+        self._displayLogs()
+    
+    def _displayLogs(self):
+        for log in self.logStack:
+            log.label.grid(row=(self.logStack.index(log) + 1), column=0,
+                     sticky='w')
+
     
 
 if __name__ == "__main__":
     root = Tk()
-    rsm = ResourceManager()
-    initResources(rsm, root)
+    rsm = ResourceManager(root)
+    lm = LogManager(root)
 
 

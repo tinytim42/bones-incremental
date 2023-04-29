@@ -7,6 +7,7 @@ class Gui:
         self.root = Tk()
         self.rsm = ResourceManager(self.root)
         self.csm = CutsceneManager(self.root)
+        self.lm = LogManager(self.root)
         self.root.title("Bones Incremental")
         self.root.configure(background="black")
         self.root.minsize(c.SCREEN_SIZE[0], c.SCREEN_SIZE[1])
@@ -23,14 +24,6 @@ class Gui:
         self.addHeaderItem(headerFrame, "Exit", self.exitGame)
 
         self.headerFrame = headerFrame
-                        
-        resourceFrame = Frame(self.root, width=200, height=600, bg=c.BGC)
-        resourceFrame.grid(row=1, column=0, padx=5, pady=5)
-        resourceFrame.grid_propagate(0)
-
-        initResources(self.rsm, resourceFrame)
-
-        self.resourceFrame = resourceFrame
 
         actionFrame = Frame(self.root, width=400, height=600, bg=c.BGC)
         actionFrame.grid(row=1, column=1, padx=5, pady=5)
@@ -55,23 +48,6 @@ class Gui:
         bonesButton.bind("<Button-1>",
                         lambda e:self.rsm._gather("Bones"))
         bonesButton.grid(row=1, column=0, padx=10, pady=5)
-
-
-        logFrame = Frame(self.root, width=300, height=600, bg=c.BGC)
-        logFrame.grid(row=1, column=2, padx=5, pady=5)
-        logFrame.grid_propagate(0)
-
-        logTitle = Label(logFrame, text="Log", bg=c.BGC,
-                        fg=c.FGC, font=c.titleFont, justify=LEFT)
-        logTitle.grid(sticky='w', row=0, column=0, padx=5, pady=5)
-
-        logItem = Label(logFrame, text="You are alone in an\novergrown graveyard.",
-                        bg=c.BGC, fg=c.FGC, font=c.font, justify=LEFT)
-        logItem.grid(row=1, column=0, padx=5, pady=5)
-
-        self.logFrame = logFrame
-        self.logTitle = logTitle
-        self.logItem = logItem
 
         self.running = True
 
