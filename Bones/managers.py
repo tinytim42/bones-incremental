@@ -25,8 +25,8 @@ class ResourceManager:
         self.keys = []
         self.resources={}
         self.root = root
-        resourceFrame = Frame(self.root, width=200, height=600, bg=c.BGC)
-        resourceFrame.grid(row=1, column=0, padx=5, pady=5)
+        resourceFrame = Frame(self.root, width=250, height=600, bg=c.BGC)
+        resourceFrame.grid(row=1, column=2, padx=5, pady=5)
         resourceFrame.grid_propagate(0)
         self.resourceFrame = resourceFrame
 
@@ -91,6 +91,12 @@ class CutsceneManager:
     
     def _createCutscene(self, title='Title',text="It's a cutscene!"):
         self.cutscenes.append(Cutscene(title, text))
+        self._activateCutscene(len(self.cutscenes)-1)
+    
+    def _activateCutscene(self, index):
+        self.cutscenes[index].frame.place(x=200, y=100)
+        self.cutscenes[index].frame.lift()
+        self.active = self.cutscenes[index]
 
     def _endCutscene(self):
         if self.active:
@@ -103,15 +109,15 @@ class Log:
         self.frame = frame
         self.label = Label(frame, text=self.text, bg=c.BGC,
                            fg=c.FGC, font=c.font, justify=LEFT,
-                           wraplength=290, padx=5)
+                           wraplength=240, padx=5)
 
 class LogManager:
     def __init__(self,root):
         self.root = root
         #stack of all logs to be displayed onscreen
         self.logStack = []
-        self.frame = Frame(self.root, width=300, height=600, bg=c.BGC)
-        self.frame.grid(row=1, column=2, padx=5, pady=5)
+        self.frame = Frame(self.root, width=250, height=600, bg=c.BGC)
+        self.frame.grid(row=1, column=0, padx=5, pady=5)
         self.frame.grid_propagate(0)
 
         logTitle = Label(self.frame, text="Log", bg=c.BGC,
@@ -119,6 +125,11 @@ class LogManager:
         logTitle.grid(sticky='w', row=0, column=0, padx=5, pady=5)
 
         logItem = Log(self.frame, text="You are alone in an overgrown graveyard.")
+        self.logStack.append(logItem)
+        self._displayLogs()
+    
+    def _createLog(self, text="It's a created log!"):
+        logItem = Log(self.frame, text=text)
         self.logStack.append(logItem)
         self._displayLogs()
     
