@@ -41,12 +41,10 @@ class Gui:
         self.actionFrame = actionFrame
         self.actionHeader = actionHeader
 
-        bonesBtn = btn(self.actionFrame, text="Dig for bones.",
-                            width=15, bg="grey", font=c.font)
-        bonesBtn.tooltip = "The damp earth contains\na grisly reward."
-        self.btnHoverConfig(bonesBtn)
-        bonesBtn.bind("<Button-1>",
-                        lambda e:self.rsm._gather("Bones"))
+        bonesBtn = Btn(self.actionFrame, text="Dig for bones.",
+                       tttext="The damp earth contains\na grisly reward.")
+        bonesBtn.bind("<Button-1>", 
+                      lambda e:self.rsm._gather("Bones"))
         bonesBtn.grid(row=1, column=0, padx=10, pady=5)
 
         self.running = True
@@ -63,67 +61,16 @@ class Gui:
         self.root.destroy()
         self.running = False
 
-    # function to change properties of button on hover
-    def changeFgOnHover(self, btn, colorOnHover, colorOnLeave):
-    
-        # adjusting background of the widget
-        # background on entering widget
-        btn.bind("<Enter>",
-                    func=lambda e: btn.config(fg=colorOnHover))
-    
-        # background color on leving widget
-        btn.bind("<Leave>",
-                    func=lambda e: btn.config(fg=colorOnLeave))
-
     def addHeaderItem(self, frame, text="Blank", action=lambda: None):
         if frame.grid_size()[0] > 0:
             divider = Label(frame, text="|", bg=c.BGC, fg=c.FGC,
                             font=c.font)
             divider.grid(row=0,column=frame.grid_size()[0])
 
-        headerBtn = btn(frame, text=text, bg=c.BGC, fg=c.FGC,
-                relief=FLAT, font=c.font, activebackground=c.BGC,
-                activeforeground="white", bd=0)
+        headerBtn = HeaderBtn(frame, text=text, action=lambda e:action())
         headerBtn.grid(row=0, column=frame.grid_size()[0])
-        headerBtn.bind("<Button-1>", lambda e:action())
-        self.changeFgOnHover(headerBtn, "skyblue", c.FGC)
 
-    def createTooltip(self, btn):
-        #gets absolute position based on root window
-        xpos = (btn.master.winfo_x() + btn.winfo_x())
-        ypos = (btn.master.winfo_y() +
-                btn.winfo_y() +
-                btn.winfo_height() + 10)
-        tt = LabelFrame(self.root, width=500, height=60, bg=c.BGC)
-        ttext = Label(tt, text=btn.tooltip, bg=c.BGC,
-                    fg=c.FGC, font=c.font)
-        ttext.grid(row=0,column=0,padx=10,pady=5)
-        tt.place(x=xpos, y=ypos)
-        btn.tt = tt
-
-    def destroyTooltip(self, btn):
-        btn.tt.destroy()
-
-    def btnEnter(self, btn):
-        if not self.csm.active:
-            self.createTooltip(btn)
-            btn.config(bg=c.FGC)
-
-    def btnLeave(self, btn):
-        if not self.csm.active:
-            self.destroyTooltip(btn)
-            btn.config(bg="grey")
-
-    def btnHoverConfig(self, btn):
-    
-        # adjusting background of the widget
-        # background on entering widget
-        btn.bind("<Enter>", func=lambda e: self.btnEnter(btn))
-    
-        # background color on leving widget
-        btn.bind("<Leave>", func=lambda e: self.btnLeave(btn))
-
-class btn(Button):
+class Btn(Button):
     def __init__(self, parent, text="It's a button!", 
                  tttext = "Tooltip yay", **kwargs):
         self.text = text
@@ -139,42 +86,66 @@ class btn(Button):
         self.tttext = tttext
         self.ttActive = False
         self.tooltip = LabelFrame(self.root, width=500, height=60, bg=c.BGC)
+
         self.label = Label(self.tooltip, text=self.tttext, bg=c.BGC,
                              fg=c.FGC, font=c.font)
         self.label.grid(row=0,column=0,padx=10,pady=5)
         #gets absolute position below button
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, text=text, 
+                         width=15, bg="grey", 
+                         font=c.font, **kwargs)
+        
+        self.xpos = 0
+        self.ypos = 0
 
-        self.xpos = (self.master.winfo_x() + self.winfo_x())
-        self.ypos = (self.master.winfo_y() +
-                     self.winfo_y() +
-                     self.winfo_height() + 10)
-
-        self.bind("<Enter>", func=lambda x: self._btnEnter)
-        self.bind("<Leave>", func=lambda x: self._btnLeave)
+        self.bind("<Enter>", lambda e:self._Enter())
+        self.bind("<Leave>", lambda e:self._Leave())
     
-    def _btnEnter(self):
+    def _Enter(self):
         if self.active:
-            btn.config(bg=c.FGC)
-            self._activateTooltip()
+            self.config(bg=c.FGC)
         else:
-            btn.config(bg=c.INACTIVE_COLOR)
+            self.config(bg=c.INACTIVE_COLOR)
         if not self.ttActive:
             self._activateTooltip()
     
-    def _btnLeave(self):
+    def _Leave(self):
         if self.active:
-            btn.config(bg="grey")
+            self.config(bg="grey")
         else:
-            btn.config(bg=c.INACTIVE_COLOR)
+            self.config(bg=c.INACTIVE_COLOR)
         if self.ttActive:
             self._deactivateTooltip()
+    
+    def _setMethod(self, action):
+        self.bind("<Button-1>", action)
 
     def _activateTooltip(self):
+        if self.xpos == 0 and self.ypos == 0:
+            self.xpos = (self.master.winfo_x() + self.winfo_x())
+            self.ypos = (self.master.winfo_y() +
+                         self.winfo_y() +
+                         self.winfo_height() + 10)
         self.tooltip.place(x=self.xpos, y=self.ypos)
+        self.ttActive = True
     
     def _deactivateTooltip(self):
-        self.tooltip.unplace()
+        self.tooltip.place_forget()
+        self.ttActive = False
+
+class HeaderBtn(Button):
+    def __init__(self, parent, text="Test", action=lambda: None, **kwargs):
+
+        super().__init__(parent, text=text, bg=c.BGC, fg=c.FGC, 
+                         relief=FLAT, font=c.font, activebackground=c.BGC, 
+                         activeforeground="white", bd=0, **kwargs)
+
+        self.bind("<Enter>", 
+                  func=lambda e: self.config(fg="skyblue"))
+        self.bind("<Leave>",
+                  func=lambda e: self.config(fg=c.FGC))
+        self.bind("<Button-1>", action)
+
 
 
 
@@ -183,4 +154,4 @@ class btn(Button):
 
 if __name__ == "__main__":
     game = Gui()
-    btn = btn(game.root)
+    btn = Btn(game.root)
