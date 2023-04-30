@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-04-30T16:25:45.034Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="QJhAR_XkaQAmFE1bpITv" version="21.2.3" type="github">
+<mxfile host="app.diagrams.net" modified="2023-04-30T17:43:43.528Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="DeptKJxt02bxYWmZZQXn" version="21.2.3" type="github">
   <diagram name="Page-1" id="syjAWIGnNoKZ114kDl3m">
     <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -97,10 +97,32 @@
         <mxCell id="WLYGhTDEyrQCLLNcTkED-16" value="Pickaxe (can mine stone)&lt;br&gt;(5 Gemstones)" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="210" y="350" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="WLYGhTDEyrQCLLNcTkED-18" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.05;entryY=0.35;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="dXtrXQo6BJToMfAPv9JH-18" target="WLYGhTDEyrQCLLNcTkED-16">
+        <mxCell id="WLYGhTDEyrQCLLNcTkED-18" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.05;entryY=0.35;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="WLYGhTDEyrQCLLNcTkED-5" target="WLYGhTDEyrQCLLNcTkED-16">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="140" y="400" as="sourcePoint" />
             <mxPoint x="210.71067811865476" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WLYGhTDEyrQCLLNcTkED-19" value="Ritual of &lt;br&gt;Strength&lt;br&gt;(80 Bones,&lt;br&gt;10 Gemstones)" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WLYGhTDEyrQCLLNcTkED-20" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="WLYGhTDEyrQCLLNcTkED-1" target="WLYGhTDEyrQCLLNcTkED-19">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="520" y="180" as="sourcePoint" />
+            <mxPoint x="590.7106781186548" y="130" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="570" y="130" />
+              <mxPoint x="570" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WLYGhTDEyrQCLLNcTkED-21" value="Ritual of&lt;br&gt;Longevity&lt;br&gt;(200 Bones,&lt;br&gt;20 Gemstones)" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WLYGhTDEyrQCLLNcTkED-22" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="WLYGhTDEyrQCLLNcTkED-19">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="410" as="sourcePoint" />
+            <mxPoint x="460" y="410" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
