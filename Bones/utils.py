@@ -1,12 +1,15 @@
 from tkinter import *
 from managers import *
 import constants as c
+import events
 
 class Gui:
     def __init__(self):
         self.root = Tk()
         self.rsm = ResourceManager(self.root)
         self.csm = CutsceneManager(self.root)
+        for event in events.csEvents:
+            self.csm._createCutscene(event)
         self.lm = LogManager(self.root)
         self.root.title("Bones Incremental")
         self.root.configure(background="black")
@@ -47,11 +50,10 @@ class Gui:
                       lambda e:self.rsm._gather("Bones"))
         bonesBtn.grid(row=1, column=0, padx=10, pady=5)
 
-        self.running = True
+        turnipBtn = BuyBtn(self.actionFrame)
+        turnipBtn.grid(row=1, column=1, padx=10, pady=5)
 
-        #starts opening cutscene
-        self.csm._createCutscene()
-        self.csm.active = self.csm.cutscenes[0]
+        self.running = True
 
     def saveGame(self):
         if not self.csm.active:
@@ -77,18 +79,14 @@ class Btn(Button):
         self.root = parent.winfo_toplevel()
         #interactable (deactivated for cutscenes)
         self.active = True
-        #if it costs something, lights up when enough resources are available
-        self.affordable = True
-        #if it's a building/upgrade, purchased deactivates clicking
-        #but leaves tooltip mouseover available for QOL
-        self.purchased = False
+
         #tooltip helpers
         self.tttext = tttext
         self.ttActive = False
         self.tooltip = LabelFrame(self.root, width=500, height=60, bg=c.BGC)
 
         self.label = Label(self.tooltip, text=self.tttext, bg=c.BGC,
-                             fg=c.FGC, font=c.font)
+                             fg=c.FGC, font=c.font, justify=LEFT)
         self.label.grid(row=0,column=0,padx=10,pady=5)
         #gets absolute position below button
         super().__init__(parent, text=text, 
@@ -98,10 +96,10 @@ class Btn(Button):
         self.xpos = 0
         self.ypos = 0
 
-        self.bind("<Enter>", lambda e:self._Enter())
-        self.bind("<Leave>", lambda e:self._Leave())
+        self.bind("<Enter>", lambda e:self._enter())
+        self.bind("<Leave>", lambda e:self._leave())
     
-    def _Enter(self):
+    def _enter(self):
         if self.active:
             self.config(bg=c.FGC)
         else:
@@ -109,7 +107,7 @@ class Btn(Button):
         if not self.ttActive:
             self._activateTooltip()
     
-    def _Leave(self):
+    def _leave(self):
         if self.active:
             self.config(bg="grey")
         else:
@@ -146,6 +144,20 @@ class HeaderBtn(Button):
                   func=lambda e: self.config(fg=c.FGC))
         self.bind("<Button-1>", action)
 
+class BuyBtn(Btn):
+    def __init__(self, parent, text="Buy Turnips", 
+                 tttext="Buy a juicy turnip.",
+                 action=lambda: None, **kwargs):
+        self.cost = {}
+        self.cost["Bones"] = 20
+        tttext = tttext + "\n----------------\n"
+        for resource in self.cost.items():
+            #formats cost tooltip
+            tttext = (tttext + resource[0] + 
+                      ": " + str(resource[1]) + "\n")
+
+
+        super().__init__(parent, text=text, tttext=tttext, **kwargs)
 
 
 
@@ -155,3 +167,4 @@ class HeaderBtn(Button):
 if __name__ == "__main__":
     game = Gui()
     btn = Btn(game.root)
+    buyBtn = BuyBtn(game.root)

@@ -8,9 +8,16 @@ class Resource:
         self.amount = initAmt
         self.max = max
         self.unlocked = True
-        self.multiplier = 1
-        self.label = Label(frame, text=(name + ": " + str(self.amount)),
-                           font=c.font, bg=c.BGC, fg=c.FGC)
+        self.nameLabel = Label(frame, text=(name + ":"),
+                               font=c.font, bg=c.BGC, fg=c.FGC)
+        self.amountLabel = Label(frame, text=str(self.amount),
+                                 font=c.font, bg=c.BGC, fg=c.FGC)
+        if self.max != -1:
+            maxText = '/' + str(self.max)
+        else:
+            maxText = " "
+        self.maxLabel = Label(frame, text= (maxText),
+                              font=c.font, bg=c.BGC, fg=c.FGC)
 
     def _get_amount(self):
         return self.amount
@@ -18,7 +25,7 @@ class Resource:
     def _set_amount(self, amount):
         self.amount = amount
         self.flarp = 1
-        self.label.configure(text=(self.name + ": " + str(self.amount)))
+        self.amountLabel.configure(text=(str(self.amount)))
 
 class ResourceManager:
     def __init__(self, root):
@@ -28,10 +35,13 @@ class ResourceManager:
         resourceFrame = Frame(self.root, width=250, height=600, bg=c.BGC)
         resourceFrame.grid(row=1, column=2, padx=5, pady=5)
         resourceFrame.grid_propagate(0)
+        resourceFrame.grid_columnconfigure(0, weight=2)
+        resourceFrame.grid_columnconfigure(1, weight=1)
+        resourceFrame.grid_columnconfigure(2, weight=1)
         self.resourceFrame = resourceFrame
 
         bones = Resource("Bones", self.resourceFrame)
-        sanity = Resource("Sanity", self.resourceFrame, 100)
+        sanity = Resource("Sanity", self.resourceFrame, 100, -1)
         resourceTitle = Label(self.resourceFrame, text="Resources",
                             bg=c.BGC, fg=c.FGC,
                             font=c.titleFont)
@@ -48,14 +58,24 @@ class ResourceManager:
 
     def _addToFrame(self, resource):
         name = resource.name
-        self.resources[name].label.grid(row=(self.keys.index(name) + 1),
-                                        column=0,
-                                        sticky='w',
-                                        padx=5)
+        rsc = self.resources[name]
+        row = self.keys.index(name) + 1
+        rsc.nameLabel.grid(row=row,
+                           column=0,
+                           sticky='w',
+                           padx=5)
+        rsc.amountLabel.grid(row=row,
+                             column=1,
+                             sticky='w',
+                             padx=5)
+        rsc.maxLabel.grid(row=row,
+                          column=2,
+                          sticky='w',
+                          padx=5)
 
-    def _gather(self, resource):
+    def _gather(self, resource, mult=1):
         amt = self.resources[resource]._get_amount()
-        self.resources[resource]._set_amount(amt + 1)
+        self.resources[resource]._set_amount(amt + mult)
 
 
 class Cutscene:
@@ -76,8 +96,8 @@ class Cutscene:
                         padx=5, pady=5)
         self.text.grid(row=1, column=0, sticky='w',
                        padx=5)
-        self.frame.place(x=200, y=100)
-        self.frame.lift()
+        #self.frame.place(x=200, y=100)
+        #self.frame.lift()
 
     def _destroy(self):
         self.frame.place_forget()
@@ -85,18 +105,17 @@ class Cutscene:
 class CutsceneManager:
     def __init__(self, root):
         self.root = root
-        self.cutscenes = []
-        self.flags = []
+        self.cutscenes = {}
         self.active = None
     
-    def _createCutscene(self, title='Title',text="It's a cutscene!"):
-        self.cutscenes.append(Cutscene(title, text))
-        self._activateCutscene(len(self.cutscenes)-1)
+    def _createCutscene(self, csText):
+        #csText is a three-item list containing key, title, and text
+        self.cutscenes[csText[0]] = (Cutscene(csText[1], csText[2]))
     
-    def _activateCutscene(self, index):
-        self.cutscenes[index].frame.place(x=200, y=100)
-        self.cutscenes[index].frame.lift()
-        self.active = self.cutscenes[index]
+    def _activateCutscene(self, key):
+        self.cutscenes[key].frame.place(x=200, y=100)
+        self.cutscenes[key].frame.lift()
+        self.active = self.cutscenes[key]
 
     def _endCutscene(self):
         if self.active:
@@ -112,7 +131,7 @@ class Log:
                            wraplength=240, padx=5)
 
 class LogManager:
-    def __init__(self,root):
+    def __init__(self, root):
         self.root = root
         #stack of all logs to be displayed onscreen
         self.logStack = []
