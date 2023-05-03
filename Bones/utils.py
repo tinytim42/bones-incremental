@@ -44,6 +44,7 @@ class Gui:
         self.actionFrame = actionFrame
         self.actionHeader = actionHeader
 
+        #may need an "_addButton" method for rsm
         bonesBtn = Btn(self.actionFrame, text="Dig for bones.",
                        tttext="The damp earth contains\na grisly reward.")
         bonesBtn.bind("<Button-1>", 
@@ -52,6 +53,7 @@ class Gui:
 
         turnipBtn = BuyBtn(self.actionFrame)
         turnipBtn.grid(row=1, column=1, padx=10, pady=5)
+        turnipBtn.bind("<Button-1>", lambda e:turnipBtn._buy(self.rsm))
 
         self.running = True
 
@@ -150,14 +152,45 @@ class BuyBtn(Btn):
                  action=lambda: None, **kwargs):
         self.cost = {}
         self.cost["Bones"] = 20
+        #placeholder for thing to buy, must be Resource, Building, 
+        #Unlock, or Upgrade class
+        self.target = "Bonerang"
+        #bool to set text color of text when not buyable
+        #also checked when calling _buy()
+        self.buyable = True
+        #for one-time purchases, deactivates
+        #button from purchasing but leaves tooltip enabled
+        self.purchased = False
+        #bool for one-time purchases
+        self.oneTime = False
+        #saves just flavor text in a separate attribute
+        #to remove resource cost after one-time purchase
+        self.flavorText = tttext
         tttext = tttext + "\n----------------\n"
         for resource in self.cost.items():
             #formats cost tooltip
             tttext = (tttext + resource[0] + 
-                      ": " + str(resource[1]) + "\n")
-
-
+                      ": " + str(resource[1]) + "\n")   
+            
         super().__init__(parent, text=text, tttext=tttext, **kwargs)
+    
+            
+    def _buy(self, rsm):
+        if self.buyable and not self.purchased:
+            for resource in self.cost.items():
+                amt = rsm.resources[resource[0]]._getAmount()
+                amt -= resource[1]
+                rsm.resources[resource[0]]._setAmount(amt)
+            if self.oneTime:
+                self.purchased = True
+                self._setPurchased()
+    
+    def _setPurchased(self):
+        self.configure(bg=c.INACTIVE_COLOR, activebackground=c.INACTIVE_COLOR)
+        self.tttext = self.flavorText
+        self.label.configure(text=self.tttext)
+        self.active = False
+        self.state = 'disabled'
 
 
 

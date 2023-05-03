@@ -19,10 +19,10 @@ class Resource:
         self.maxLabel = Label(frame, text= (maxText),
                               font=c.font, bg=c.BGC, fg=c.FGC)
 
-    def _get_amount(self):
+    def _getAmount(self):
         return self.amount
 
-    def _set_amount(self, amount):
+    def _setAmount(self, amount):
         self.amount = amount
         self.flarp = 1
         self.amountLabel.configure(text=(str(self.amount)))
@@ -74,8 +74,8 @@ class ResourceManager:
                           padx=5)
 
     def _gather(self, resource, mult=1):
-        amt = self.resources[resource]._get_amount()
-        self.resources[resource]._set_amount(amt + mult)
+        amt = self.resources[resource]._getAmount()
+        self.resources[resource]._setAmount(amt + mult)
 
 
 class Cutscene:
@@ -157,6 +157,9 @@ class LogManager:
             log.label.grid(row=(self.logStack.index(log) + 1), column=0,
                      sticky='w')
 
+class ActionManager:
+    def __init__(self, rsm):
+        pass
     
 
 if __name__ == "__main__":
