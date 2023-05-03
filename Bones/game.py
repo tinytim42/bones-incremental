@@ -19,6 +19,7 @@ game.csm._activateCutscene('Introduction')
 
 while game.running:
     game.root.update_idletasks()
+    game._updateGui()
     game.root.update()
 
 

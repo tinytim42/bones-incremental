@@ -1,31 +1,9 @@
 #Resource Manager
 from tkinter import *
+from objects import *
 import constants as c
 
-class Resource:
-    def __init__(self, name, frame, initAmt=0, max = 200):
-        self.name = name
-        self.amount = initAmt
-        self.max = max
-        self.unlocked = True
-        self.nameLabel = Label(frame, text=(name + ":"),
-                               font=c.font, bg=c.BGC, fg=c.FGC)
-        self.amountLabel = Label(frame, text=str(self.amount),
-                                 font=c.font, bg=c.BGC, fg=c.FGC)
-        if self.max != -1:
-            maxText = '/' + str(self.max)
-        else:
-            maxText = " "
-        self.maxLabel = Label(frame, text= (maxText),
-                              font=c.font, bg=c.BGC, fg=c.FGC)
 
-    def _getAmount(self):
-        return self.amount
-
-    def _setAmount(self, amount):
-        self.amount = amount
-        self.flarp = 1
-        self.amountLabel.configure(text=(str(self.amount)))
 
 class ResourceManager:
     def __init__(self, root):
@@ -78,29 +56,6 @@ class ResourceManager:
         self.resources[resource]._setAmount(amt + mult)
 
 
-class Cutscene:
-    def __init__(self, title="Title", text="Cutscene."):
-        text = text.replace('\n', " ")
-        self.frame = Frame(width=500, height=400, bg=c.BGC,
-                           highlightbackground="black",
-                           highlightthickness=5)
-        self.frame.grid_propagate(0)
-        self.title = Label(self.frame, text=title,
-                           bg=c.BGC, fg=c.FGC,
-                           font=c.titleFont)
-        self.text = Label(self.frame, text=text,
-                          bg=c.BGC, fg=c.FGC,
-                          font=c.font, justify=LEFT,
-                          wraplength=490)
-        self.title.grid(row=0, column=0, sticky='w',
-                        padx=5, pady=5)
-        self.text.grid(row=1, column=0, sticky='w',
-                       padx=5)
-        #self.frame.place(x=200, y=100)
-        #self.frame.lift()
-
-    def _destroy(self):
-        self.frame.place_forget()
 
 class CutsceneManager:
     def __init__(self, root):
@@ -122,13 +77,7 @@ class CutsceneManager:
             self.active._destroy()
             self.active = None
 
-class Log:
-    def __init__(self, frame, text="It's a log!"):
-        self.text = text
-        self.frame = frame
-        self.label = Label(frame, text=self.text, bg=c.BGC,
-                           fg=c.FGC, font=c.font, justify=LEFT,
-                           wraplength=240, padx=5)
+
 
 class LogManager:
     def __init__(self, root):
@@ -157,10 +106,60 @@ class LogManager:
             log.label.grid(row=(self.logStack.index(log) + 1), column=0,
                      sticky='w')
 
+#class for managing action frame
 class ActionManager:
-    def __init__(self, rsm):
-        pass
+    def __init__(self, root, rsm):
+        self.root = root
+        self.rsm = rsm
+        self.tabs = []
+        self.activeTab = None
+        actionFrame = Frame(self.root, width=400, height=600, bg=c.BGC)
+        actionFrame.grid(row=1, column=1, padx=5, pady=5)
+        actionFrame.grid_propagate(0)
+
+        actionHeader = Frame(actionFrame, bg=c.BGC, width=400, height=40)
+        actionHeader.grid(row=0,column=0)
+        actionHeader.grid_propagate(0)
     
+        self.frame = actionFrame
+        self.header = actionHeader
+    
+    def _addTab(self, tab):
+        self.tabs.append(tab)
+    
+    def _changeTab(self):
+        pass
+
+
+#Tab class is for displaying and containing buttons in actionFrame
+class Tab:
+    def __init__(self, name, parent):
+        self.name = name
+        self.frame = Frame(parent, width=400, height=540, bg=c.BGC)
+        self.parent = parent
+        self.btn = None
+        self.active = False
+        #2D list [widget, row, column]
+        self.contents = []
+    
+    def _addContent(self, widget, col, row):
+        self.contents.append([widget, col, row])
+    
+    def _activateTab(self):
+        if not self.active:
+            self.active
+            self.frame.grid(row=1,column=0)
+    
+    def _deactivateTab(self):
+        if self.active:
+            self.active = False
+            for content in self.contents:
+                content[0].ungrid()
+
+
+
+
+
 
 if __name__ == "__main__":
     root = Tk()
