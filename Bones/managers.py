@@ -16,46 +16,71 @@ class ResourceManager:
         resourceFrame.grid_columnconfigure(0, weight=2)
         resourceFrame.grid_columnconfigure(1, weight=1)
         resourceFrame.grid_columnconfigure(2, weight=1)
-        self.resourceFrame = resourceFrame
+        self.frame = resourceFrame
 
-        bones = Resource("Bones", self.resourceFrame)
-        sanity = Resource("Sanity", self.resourceFrame, 100, -1)
-        resourceTitle = Label(self.resourceFrame, text="Resources",
+        resourceTitle = Label(self.frame, text="Resources",
                             bg=c.BGC, fg=c.FGC,
                             font=c.titleFont)
         resourceTitle.grid(sticky='w', row=0, column=0,
                         padx=5, pady=5)
-        self._addResource(bones)
-        self._addResource(sanity)
-        self._addToFrame(bones)
-        self._addToFrame(sanity)
+        for resource in self._createResources():
+            self._addResource(resource)
+        self._addToFrame("Sanity")
+        self._addToFrame("Bones")
 
     def _addResource(self, resource):
         self.keys.append(resource.name)
         self.resources[resource.name] = resource
 
-    def _addToFrame(self, resource):
-        name = resource.name
+    def _addToFrame(self, name):
         rsc = self.resources[name]
         row = self.keys.index(name) + 1
-        rsc.nameLabel.grid(row=row,
+        rsc.nameLabel.grid(in_=self.frame,
+                           row=row,
                            column=0,
                            sticky='w',
                            padx=5)
-        rsc.amountLabel.grid(row=row,
-                             column=1,
-                             sticky='w',
-                             padx=5)
+        rsc.amtLabel.grid(row=row,
+                          column=1,
+                          sticky='w',
+                          padx=5,
+                          in_=self.frame)
         rsc.maxLabel.grid(row=row,
                           column=2,
                           sticky='w',
-                          padx=5)
+                          padx=5,
+                          in_=self.frame)
 
-    def _gather(self, resource, mult=1):
-        amt = self.resources[resource]._getAmount()
-        self.resources[resource]._setAmount(amt + mult)
-
-
+    def _gather(self, resource, src="Click"):
+        rsc = self.resources[resource]
+        if src == "Click":
+            mult = rsc.clickMult
+        else:
+            mult = rsc.autoMult
+        amt = rsc._getAmt()
+        rsc._setAmt(amt + mult)
+        if rsc.unlocked == False:
+            rsc.unlocked == True
+            self._addToFrame(rsc.name)
+    
+    def _createResources(self):
+        resourceList = [
+            Resource("Sanity",
+                    max=-1,
+                    initAmt=100),
+            Resource("Bones", 
+                    max=200, 
+                    initAmt=0),
+            Resource("Turnips", 
+                    max=100,
+                    initAmt = 0,
+                    unlocked=False),
+            Resource("Golden Turnips",
+                    max=10,
+                    initAmt=0,
+                    unlocked=False)
+        ]
+        return resourceList
 
 class CutsceneManager:
     def __init__(self, root):
@@ -76,8 +101,6 @@ class CutsceneManager:
         if self.active:
             self.active._destroy()
             self.active = None
-
-
 
 class LogManager:
     def __init__(self, root):
@@ -123,38 +146,60 @@ class ActionManager:
     
         self.frame = actionFrame
         self.header = actionHeader
+
+        for tab in self._createTabs():
+            self._addTab(tab)
+        self._addToFrame(0)
+        self._addToFrame(1)
+        self._changeTab(0)
     
     def _addTab(self, tab):
+        tab.parent = self.frame
         self.tabs.append(tab)
     
-    def _changeTab(self):
-        pass
+    def _changeTab(self, tabIndex):
+        for i in range(len(self.tabs)):
+            if i != tabIndex:
+                self.tabs[i]._deactivateTab()
+        self.tabs[tabIndex]._activateTab()
+        self.activeTab = self.tabs[tabIndex]
+
+    def _addToFrame(self, tabIndex):
+        tab = self.tabs[tabIndex]
+        if self.header.grid_size()[0] > 0:
+            divider = Label(self.header, text="|", bg=c.BGC, fg=c.FGC,
+                            font=c.font)
+            divider.grid(row=0,column=self.header.grid_size()[0])
+
+        headerBtn = HeaderBtn(self.header, text=tab.name, action=lambda e:self._changeTab(tabIndex))
+        tab.btn = headerBtn
+        headerBtn.grid(row=0, column=self.header.grid_size()[0])
+    
+    def _createTabs(self):
+        tabList = []
+        graveyard = Tab("Graveyard")
+        graveyard.frame.grid_columnconfigure(0, weight=1)
+        graveyard.frame.grid_columnconfigure(1, weight=1)
+        bonesBtn = Btn(graveyard.frame, text="Dig for bones.",
+                       tttext="The damp earth contains\na grisly reward.")
+        bonesBtn.bind("<Button-1>", 
+                      lambda e:self.rsm._gather("Bones", "Click"))
+        graveyard._addContent(bonesBtn, 0, 0)
+        graveyard._addToFrame(0)
+
+        turnipBtn = BuyBtn(graveyard.frame)
+        turnipBtn.bind("<Button-1>", lambda e:turnipBtn._buy(self.rsm))
+        graveyard._addContent(turnipBtn, 0, 1)
+        graveyard._addToFrame(1)
+        tabList.append(graveyard)
+        town = Tab("Town")
+        tabList.append(town)
+        return tabList
 
 
-#Tab class is for displaying and containing buttons in actionFrame
-class Tab:
-    def __init__(self, name, parent):
-        self.name = name
-        self.frame = Frame(parent, width=400, height=540, bg=c.BGC)
-        self.parent = parent
-        self.btn = None
-        self.active = False
-        #2D list [widget, row, column]
-        self.contents = []
-    
-    def _addContent(self, widget, col, row):
-        self.contents.append([widget, col, row])
-    
-    def _activateTab(self):
-        if not self.active:
-            self.active
-            self.frame.grid(row=1,column=0)
-    
-    def _deactivateTab(self):
-        if self.active:
-            self.active = False
-            for content in self.contents:
-                content[0].ungrid()
+
+
+
 
 
 
@@ -165,5 +210,6 @@ if __name__ == "__main__":
     root = Tk()
     rsm = ResourceManager(root)
     lm = LogManager(root)
+    afm = ActionManager(root, rsm)
 
 

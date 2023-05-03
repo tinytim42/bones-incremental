@@ -2,29 +2,37 @@ from tkinter import *
 import constants as c
 
 class Resource:
-    def __init__(self, name, frame, initAmt=0, max = 200):
+    def __init__(self, name, initAmt=0, max = 200, unlocked=True):
         self.name = name
-        self.amount = initAmt
+        self.amt = initAmt
+        self.clickMult = 1
+        self.auotMult = 1
         self.max = max
-        self.unlocked = True
-        self.nameLabel = Label(frame, text=(name + ":"),
+        self.unlocked = unlocked
+        self.nameLabel = Label(text=(name + ":"),
                                font=c.font, bg=c.BGC, fg=c.FGC)
-        self.amountLabel = Label(frame, text=str(self.amount),
+        self.amtLabel = Label(text=str(self.amt),
                                  font=c.font, bg=c.BGC, fg=c.FGC)
         if self.max != -1:
             maxText = '/' + str(self.max)
         else:
             maxText = " "
-        self.maxLabel = Label(frame, text= (maxText),
+        self.maxLabel = Label(text= (maxText),
                               font=c.font, bg=c.BGC, fg=c.FGC)
 
-    def _getAmount(self):
-        return self.amount
+    def _getAmt(self):
+        return self.amt
 
-    def _setAmount(self, amount):
-        self.amount = amount
+    def _setAmt(self, amt):
+        self.amt = amt
         self.flarp = 1
-        self.amountLabel.configure(text=(str(self.amount)))
+        self.amtLabel.configure(text=(str(self.amt)))
+
+class Unlock:
+    def __init__(self, name, frame):
+        self.name = name
+        self.frame = frame
+        self.unlocked = False
 
 class Cutscene:
     def __init__(self, title="Title", text="Cutscene."):
@@ -44,8 +52,6 @@ class Cutscene:
                         padx=5, pady=5)
         self.text.grid(row=1, column=0, sticky='w',
                        padx=5)
-        #self.frame.place(x=200, y=100)
-        #self.frame.lift()
 
     def _destroy(self):
         self.frame.place_forget()
@@ -137,10 +143,10 @@ class BuyBtn(Btn):
                  tttext="Buy a juicy turnip.",
                  action=lambda: None, **kwargs):
         self.cost = {}
-        self.cost["Bones"] = 20
+        self.cost["Bones"] = 5
         #placeholder for thing to buy, must be Resource, Building, 
         #Unlock, or Upgrade class
-        self.target = "Bonerang"
+        self.target = "Turnips"
         #bool to set text color of text when not buyable
         #also checked when calling _buy()
         self.buyable = True
@@ -164,13 +170,14 @@ class BuyBtn(Btn):
     def _buy(self, rsm):
         if self.buyable and not self.purchased:
             for resource in self.cost.items():
-                amt = rsm.resources[resource[0]]._getAmount()
+                amt = rsm.resources[resource[0]]._getAmt()
                 amt -= resource[1]
-                rsm.resources[resource[0]]._setAmount(amt)
+                rsm.resources[resource[0]]._setAmt(amt)
             if self.oneTime:
                 self.purchased = True
                 self._setPurchased()
-    
+            rsm._gather(self.target)
+                    
     def _setPurchased(self):
         self.configure(bg=c.INACTIVE_COLOR, activebackground=c.INACTIVE_COLOR)
         self.tttext = self.flavorText
@@ -183,7 +190,7 @@ class BuyBtn(Btn):
     def _setBuyable(self, rsm):
         for resource in self.cost.items():
             cost = resource[1]
-            amt = rsm.resources[resource[0]]._getAmount()
+            amt = rsm.resources[resource[0]]._getAmt()
             
         if self.buyable:
             if cost > amt:
@@ -201,3 +208,41 @@ class BuyBtn(Btn):
                 self.bgc = c.IVORY
                 self.fgc = c.BLACK
                 self.ac = c.AC
+
+#Tab class is for displaying and containing buttons in actionFrame
+class Tab:
+    def __init__(self, name):
+        self.name = name
+        self.frame = Frame(width=400, height=540, bg=c.BGC)
+        self.frame.grid_propagate(0)
+        self.parent = None
+        self.btn = None
+        self.active = False
+        #2D list [widget, row, column]
+        self.contents = []
+    
+    def _addContent(self, widget, row, col):
+        self.contents.append([widget, row, col])
+    
+    def _addToFrame(self, widgetIndex):
+        content = self.contents[widgetIndex]
+        content[0].grid(in_=self.frame,
+                        row=content[1],
+                        column=content[2],
+                        padx=10, pady=5)
+    
+    def _activateTab(self):
+        if not self.active:
+            self.active = True
+            print(self.name + " activated.")
+            self.frame.grid(in_=self.parent, row=1,column=0)
+            if self.btn:
+                self.btn.configure(font=c.boldFont)
+    
+    def _deactivateTab(self):
+        print(self.name + " deactivated.")
+        if self.active:
+            self.active = False
+            self.frame.grid_forget()
+            if self.btn:
+                self.btn.configure(font=c.font)
