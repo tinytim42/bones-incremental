@@ -47,7 +47,7 @@ class ResourceManager:
                           in_=self.frame)
         rsc.maxLabel.grid(row=row,
                           column=2,
-                          sticky='w',
+                          sticky='e',
                           padx=5,
                           in_=self.frame)
 
@@ -72,7 +72,7 @@ class ResourceManager:
                     max=200, 
                     initAmt=0),
             Resource("Turnips", 
-                    max=100,
+                    max=1000,
                     initAmt = 0,
                     unlocked=False),
             Resource("Golden Turnips",
@@ -150,7 +150,6 @@ class ActionManager:
         for tab in self._createTabs():
             self._addTab(tab)
         self._addToFrame(0)
-        self._addToFrame(1)
         self._changeTab(0)
     
     def _addTab(self, tab):
@@ -196,13 +195,29 @@ class ActionManager:
         tabList.append(town)
         return tabList
 
-
-
-
-
-
-
-
+class UpgradeManager:
+    def __init__(self, root, rsm):
+        self.root = root
+        self.rsm = rsm
+        self.keys = []
+        self.upgradeList = {}
+    
+    def _createUpgrades(self):
+        ug = Upgrade("Shovel1", "Bones", 1, "Click")
+        self._addUpgrade(ug)
+    
+    def _addUpgrade(self, upgrade):
+        self.upgradeList[upgrade.name] = upgrade
+        self.keys.append(upgrade.name)
+    
+    def _activateUpgrade(self, name):
+        ug = self.upgradeList[name]
+        resource = self.rsm.resources[ug.resource]
+        mult = ug.mult
+        src = ug.src
+        currentMult = resource._getMult(src)
+        newMult = currentMult + mult
+        resource._setMult(newMult, src)
 
 
 

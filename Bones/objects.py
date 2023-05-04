@@ -6,7 +6,7 @@ class Resource:
         self.name = name
         self.amt = initAmt
         self.clickMult = 1
-        self.auotMult = 1
+        self.autoMult = 1
         self.max = max
         self.unlocked = unlocked
         self.nameLabel = Label(text=(name + ":"),
@@ -27,11 +27,25 @@ class Resource:
         self.amt = amt
         self.flarp = 1
         self.amtLabel.configure(text=(str(self.amt)))
+    
+    def _getMult(self, src="Click"):
+        if src == "Click":
+            return self.clickMult
+        else:
+            return self.autoMult
+    
+    def _setMult(self, mult, src="Click"):
+        if src == "Click":
+            self.clickMult = mult
+        else:
+            self.autoMult = mult
 
-class Unlock:
-    def __init__(self, name, frame):
+class Upgrade:
+    def __init__(self, name, resource, mult=1, src="Click"):
         self.name = name
-        self.frame = frame
+        self.resource = resource
+        self.mult = mult
+        self.src = src
         self.unlocked = False
 
 class Cutscene:
@@ -167,7 +181,7 @@ class BuyBtn(Btn):
         super().__init__(parent, text=text, tttext=tttext, **kwargs)
     
             
-    def _buy(self, rsm):
+    def _buy(self, rsm, ugm = None):
         if self.buyable and not self.purchased:
             for resource in self.cost.items():
                 amt = rsm.resources[resource[0]]._getAmt()
@@ -176,8 +190,11 @@ class BuyBtn(Btn):
             if self.oneTime:
                 self.purchased = True
                 self._setPurchased()
-            rsm._gather(self.target)
-                    
+            if self.target in rsm.keys:
+                rsm._gather(self.target)
+            elif self.target in ugm.keys:
+                ugm._activateUpgrade(self.target)
+
     def _setPurchased(self):
         self.configure(bg=c.INACTIVE_COLOR, activebackground=c.INACTIVE_COLOR)
         self.tttext = self.flavorText
@@ -234,13 +251,11 @@ class Tab:
     def _activateTab(self):
         if not self.active:
             self.active = True
-            print(self.name + " activated.")
             self.frame.grid(in_=self.parent, row=1,column=0)
             if self.btn:
                 self.btn.configure(font=c.boldFont)
     
     def _deactivateTab(self):
-        print(self.name + " deactivated.")
         if self.active:
             self.active = False
             self.frame.grid_forget()
