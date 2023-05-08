@@ -155,12 +155,11 @@ class HeaderBtn(Button):
 class BuyBtn(Btn):
     def __init__(self, parent, text="Buy Turnips", 
                  tttext="Buy a juicy turnip.",
-                 action=lambda: None, **kwargs):
-        self.cost = {}
-        self.cost["Bones"] = 5
+                 cost = {"Bones":5}, target="Turnips", **kwargs):
+        self.cost = cost
         #placeholder for thing to buy, must be Resource, Building, 
         #Unlock, or Upgrade class
-        self.target = "Turnips"
+        self.target = target
         #bool to set text color of text when not buyable
         #also checked when calling _buy()
         self.buyable = True
@@ -194,6 +193,8 @@ class BuyBtn(Btn):
                 rsm._gather(self.target)
             elif self.target in ugm.keys:
                 ugm._activateUpgrade(self.target)
+            else:
+                print(self.target)
 
     def _setPurchased(self):
         self.configure(bg=c.INACTIVE_COLOR, activebackground=c.INACTIVE_COLOR)
@@ -208,23 +209,23 @@ class BuyBtn(Btn):
         for resource in self.cost.items():
             cost = resource[1]
             amt = rsm.resources[resource[0]]._getAmt()
-            
-        if self.buyable:
-            if cost > amt:
-                self.buyable = False
-                self.configure(fg=c.UNBUYABLE_COLOR, bg=c.INACTIVE_COLOR,
-                               activebackground=c.INACTIVE_COLOR,
-                               activeforeground=c.UNBUYABLE_AC)
-                self.ac = c.INACTIVE_COLOR
-                self.bgc = c.INACTIVE_COLOR
-                self.fgc = c.UNBUYABLE_COLOR
-        else:
-            if cost <= amt:
-                self.buyable = True
-                self.configure(fg=c.BLACK, bg=c.IVORY)
-                self.bgc = c.IVORY
-                self.fgc = c.BLACK
-                self.ac = c.AC
+        if not self.purchased:
+            if self.buyable:
+                if cost > amt:
+                    self.buyable = False
+                    self.configure(fg=c.UNBUYABLE_COLOR, bg=c.INACTIVE_COLOR,
+                                activebackground=c.INACTIVE_COLOR,
+                                activeforeground=c.UNBUYABLE_AC)
+                    self.ac = c.INACTIVE_COLOR
+                    self.bgc = c.INACTIVE_COLOR
+                    self.fgc = c.UNBUYABLE_COLOR
+            else:
+                if cost <= amt:
+                    self.buyable = True
+                    self.configure(fg=c.BLACK, bg=c.IVORY)
+                    self.bgc = c.IVORY
+                    self.fgc = c.BLACK
+                    self.ac = c.AC
 
 #Tab class is for displaying and containing buttons in actionFrame
 class Tab:
@@ -252,6 +253,7 @@ class Tab:
         if not self.active:
             self.active = True
             self.frame.grid(in_=self.parent, row=1,column=0)
+            self.frame.grid_propagate(0)
             if self.btn:
                 self.btn.configure(font=c.boldFont)
     

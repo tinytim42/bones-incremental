@@ -2,17 +2,18 @@ from tkinter import *
 from managers import *
 from objects import *
 import constants as c
-import events
+import text
 
 class Gui:
     def __init__(self):
         self.root = Tk()
         self.rsm = ResourceManager(self.root)
         self.csm = CutsceneManager(self.root)
-        for event in events.csEvents:
-            self.csm._createCutscene(event)
+        for key in text.csEvents.keys():
+            self.csm._createCutscene(key, text.csEvents[key])
         self.lm = LogManager(self.root)
-        self.afm = ActionManager(self.root, self.rsm)
+        self.ugm = UpgradeManager(self.root, self.rsm)
+        self.afm = ActionManager(self.root, self.rsm, self.ugm)
         self.root.title("Bones Incremental")
         self.root.configure(background="black")
         self.root.minsize(c.SCREEN_SIZE[0], c.SCREEN_SIZE[1])

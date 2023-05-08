@@ -1,11 +1,5 @@
-#TODO: utils.actionFrame needs its own manager that can add buttons
-#      and access resources, to manage gathering and purchasing
-
-#TODO: actionFrame manager will also need the ability to swap between
-#      different tabs, ungridding and regridding buttons as necessary
-
-#TODO: code purchasing
-
+#TODO: code upgrades that change multiplier for resource gathering
+#TODO: allow flags to unlock new tabs/resources/buttons
 #TODO: create flag manager
 
 from tkinter import *

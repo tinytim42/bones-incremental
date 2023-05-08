@@ -88,9 +88,9 @@ class CutsceneManager:
         self.cutscenes = {}
         self.active = None
     
-    def _createCutscene(self, csText):
+    def _createCutscene(self, csTitle, csText):
         #csText is a three-item list containing key, title, and text
-        self.cutscenes[csText[0]] = (Cutscene(csText[1], csText[2]))
+        self.cutscenes[csTitle] = (Cutscene(csText[0], csText[1]))
     
     def _activateCutscene(self, key):
         self.cutscenes[key].frame.place(x=200, y=100)
@@ -131,9 +131,10 @@ class LogManager:
 
 #class for managing action frame
 class ActionManager:
-    def __init__(self, root, rsm):
+    def __init__(self, root, rsm, ugm):
         self.root = root
         self.rsm = rsm
+        self.ugm = ugm
         self.tabs = []
         self.activeTab = None
         actionFrame = Frame(self.root, width=400, height=600, bg=c.BGC)
@@ -150,6 +151,7 @@ class ActionManager:
         for tab in self._createTabs():
             self._addTab(tab)
         self._addToFrame(0)
+        self._addToFrame(1)
         self._changeTab(0)
     
     def _addTab(self, tab):
@@ -192,6 +194,16 @@ class ActionManager:
         graveyard._addToFrame(1)
         tabList.append(graveyard)
         town = Tab("Town")
+        town.frame.grid_columnconfigure(0, weight=1)
+        town.frame.grid_columnconfigure(1, weight=1)
+        shovel1Btn = BuyBtn(town.frame, "A Better Shovel.",
+                            """Dr. Ost has generously offered to trade a better 
+shovel for your hard-earned bones. What could 
+he want with them? Research, perhaps.""", {"Bones": 100}, target="Shovel1")
+        shovel1Btn.oneTime = True
+        shovel1Btn.bind("<Button-1>", lambda e:shovel1Btn._buy(self.rsm, self.ugm))
+        town._addContent(shovel1Btn, 0, 0)
+        town._addToFrame(0)
         tabList.append(town)
         return tabList
 
@@ -201,6 +213,7 @@ class UpgradeManager:
         self.rsm = rsm
         self.keys = []
         self.upgradeList = {}
+        self._createUpgrades()
     
     def _createUpgrades(self):
         ug = Upgrade("Shovel1", "Bones", 1, "Click")
