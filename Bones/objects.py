@@ -96,10 +96,11 @@ class Btn(Button):
         #tooltip helpers
         self.tttext = tttext
         self.ttActive = False
-        self.tooltip = LabelFrame(self.root, width=500, height=60, bg=c.BGC)
+        self.tooltip = LabelFrame(self.root, width=100, height=60, bg=c.BGC)
 
         self.label = Label(self.tooltip, text=self.tttext, bg=c.BGC,
-                             fg=c.FGC, font=c.font, justify=LEFT)
+                             fg=c.FGC, font=c.font, justify=LEFT,
+                             wraplength=100)
         self.label.grid(row=0,column=0,padx=10,pady=5)
         #gets absolute position below button
         super().__init__(parent, text=text, 
@@ -263,3 +264,14 @@ class Tab:
             self.frame.grid_forget()
             if self.btn:
                 self.btn.configure(font=c.font)
+
+Btns = {
+    "Shovel1": {
+        "text": "A Better Shovel.",
+        "tttext":  """Dr. Ost has generously offered to trade 
+        a better shovel for your hard-earned bones. What could
+        he want with them? Research, perhaps.""",
+        "cost": {"Bones": 100},
+        "target": "Shovel1"
+    }
+}
