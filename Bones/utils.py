@@ -55,7 +55,7 @@ class Gui:
         #btns = self.actionFrame.winfo_children()
         for b in btns:
             if b.__class__.__name__ == "BuyBtn":
-                b._setBuyable(self.rsm)
+                b._setBuyable()
 
 if __name__ == "__main__":
     game = Gui()

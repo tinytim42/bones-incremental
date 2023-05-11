@@ -80,9 +80,8 @@ class Log:
 
 
 class Btn(Button):
-    def __init__(self, parent, text="It's a button!", 
-                 tttext = "Tooltip yay", **kwargs):
-        self.text = text
+    def __init__(self, parent, dict, **kwargs):
+        self.text = dict['text']
         self.root = parent.winfo_toplevel()
         #interactable (deactivated for cutscenes)
         self.active = True
@@ -94,16 +93,16 @@ class Btn(Button):
         self.ac = c.AC
 
         #tooltip helpers
-        self.tttext = tttext
+        self.tttext = dict['tttext']
         self.ttActive = False
         self.tooltip = LabelFrame(self.root, width=100, height=60, bg=c.BGC)
 
         self.label = Label(self.tooltip, text=self.tttext, bg=c.BGC,
                              fg=c.FGC, font=c.font, justify=LEFT,
-                             wraplength=100)
+                             wraplength=150)
         self.label.grid(row=0,column=0,padx=10,pady=5)
         #gets absolute position below button
-        super().__init__(parent, text=text, 
+        super().__init__(parent, text=dict['text'], 
                          width=15, bg=self.bgc, 
                          font=c.font, fg=self.fgc,
                          **kwargs)
@@ -154,13 +153,12 @@ class HeaderBtn(Button):
         self.bind("<Button-1>", action)
 
 class BuyBtn(Btn):
-    def __init__(self, parent, text="Buy Turnips", 
-                 tttext="Buy a juicy turnip.",
-                 cost = {"Bones":5}, target="Turnips", **kwargs):
-        self.cost = cost
+    def __init__(self, parent, mgr, dict, **kwargs):
+        self.mgr = mgr
+        self.cost = dict['cost']
         #placeholder for thing to buy, must be Resource, Building, 
         #Unlock, or Upgrade class
-        self.target = target
+        self.target = dict['target']
         #bool to set text color of text when not buyable
         #also checked when calling _buy()
         self.buyable = True
@@ -168,20 +166,28 @@ class BuyBtn(Btn):
         #button from purchasing but leaves tooltip enabled
         self.purchased = False
         #bool for one-time purchases
-        self.oneTime = False
+        self.oneTime = dict["oneTime"]
         #saves just flavor text in a separate attribute
         #to remove resource cost after one-time purchase
-        self.flavorText = tttext
-        tttext = tttext + "\n----------------\n"
+        self.flavorText = dict["tttext"]
+        self.flavorText.replace("\t", "")
+        self.flavorText.replace("\n", " ")
+        tttext = self.flavorText + "\n----------------\n"
         for resource in self.cost.items():
             #formats cost tooltip
             tttext = (tttext + resource[0] + 
-                      ": " + str(resource[1]) + "\n")   
+                      ": " + str(resource[1]) + "\n")
+        
+        dict['tttext'] = tttext
             
-        super().__init__(parent, text=text, tttext=tttext, **kwargs)
+        super().__init__(parent, dict, **kwargs)
+        self.bind("<Button-1>", lambda e: self._buy())
     
             
-    def _buy(self, rsm, ugm = None):
+    def _buy(self):
+        global game
+        rsm = self.mgr.rsm
+        ugm = self.mgr.ugm
         if self.buyable and not self.purchased:
             for resource in self.cost.items():
                 amt = rsm.resources[resource[0]]._getAmt()
@@ -206,10 +212,10 @@ class BuyBtn(Btn):
         self.bgc = c.INACTIVE_COLOR
         self.state = 'disabled'
     
-    def _setBuyable(self, rsm):
+    def _setBuyable(self):
         for resource in self.cost.items():
             cost = resource[1]
-            amt = rsm.resources[resource[0]]._getAmt()
+            amt = self.mgr.rsm.resources[resource[0]]._getAmt()
         if not self.purchased:
             if self.buyable:
                 if cost > amt:
@@ -265,13 +271,28 @@ class Tab:
             if self.btn:
                 self.btn.configure(font=c.font)
 
-Btns = {
+buyBtns = {
     "Shovel1": {
         "text": "A Better Shovel.",
         "tttext":  """Dr. Ost has generously offered to trade 
         a better shovel for your hard-earned bones. What could
         he want with them? Research, perhaps.""",
         "cost": {"Bones": 100},
-        "target": "Shovel1"
+        "target": "Shovel1",
+        "oneTime": True
+    },
+    "Turnip": {
+        "text": "Buy Turnip",
+        "tttext":  "Buy a juicy turnip!",
+        "cost": {"Bones": 5},
+        "target": "Turnips",
+        "oneTime": False
+    }
+}
+
+btns = {
+    "Bones": {
+        "text": "Dig for bones.",
+        "tttext": "The damp earth contains a grisly reward."
     }
 }

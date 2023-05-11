@@ -181,27 +181,22 @@ class ActionManager:
         graveyard = Tab("Graveyard")
         graveyard.frame.grid_columnconfigure(0, weight=1)
         graveyard.frame.grid_columnconfigure(1, weight=1)
-        bonesBtn = Btn(graveyard.frame, text="Dig for bones.",
-                       tttext="The damp earth contains\na grisly reward.")
+        bonesBtn = Btn(graveyard.frame, btns["Bones"])
         bonesBtn.bind("<Button-1>", 
                       lambda e:self.rsm._gather("Bones", "Click"))
         graveyard._addContent(bonesBtn, 0, 0)
         graveyard._addToFrame(0)
 
-        turnipBtn = BuyBtn(graveyard.frame)
-        turnipBtn.bind("<Button-1>", lambda e:turnipBtn._buy(self.rsm))
+        turnipBtn = BuyBtn(graveyard.frame, self, buyBtns["Turnip"])
+        #turnipBtn.bind("<Button-1>", lambda e:turnipBtn._buy())
         graveyard._addContent(turnipBtn, 0, 1)
         graveyard._addToFrame(1)
         tabList.append(graveyard)
         town = Tab("Town")
         town.frame.grid_columnconfigure(0, weight=1)
         town.frame.grid_columnconfigure(1, weight=1)
-        shovel1Btn = BuyBtn(town.frame, "A Better Shovel.",
-                            """Dr. Ost has generously offered to trade a better 
-shovel for your hard-earned bones. What could 
-he want with them? Research, perhaps.""", {"Bones": 100}, target="Shovel1")
-        shovel1Btn.oneTime = True
-        shovel1Btn.bind("<Button-1>", lambda e:shovel1Btn._buy(self.rsm, self.ugm))
+        shovel1Btn = BuyBtn(town.frame, self, buyBtns["Shovel1"])
+        #shovel1Btn.bind("<Button-1>", lambda e:shovel1Btn._buy())
         town._addContent(shovel1Btn, 0, 0)
         town._addToFrame(0)
         tabList.append(town)
