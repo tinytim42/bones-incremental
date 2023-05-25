@@ -11,10 +11,8 @@ know what you must do."""]
 csEvents["Shovel Upgrade"] = ["Tools of the Trade", 
 """Your hands ache from exertion. The \
 coarse wood of the shovel and its blunted point make this \
-arduous labor slow and painful. Surely there is someone in town who might supply superior  \
+arduous labor slow and painful. Surely there is someone in town who might supply superior \
 tools, better suited to your task."""]
-
-tooltips = {}
 
 
 

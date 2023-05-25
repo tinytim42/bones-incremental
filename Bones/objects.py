@@ -1,4 +1,5 @@
 from tkinter import *
+from textwrap import dedent
 import constants as c
 
 class Resource:
@@ -274,9 +275,9 @@ class Tab:
 buyBtns = {
     "Shovel1": {
         "text": "A Better Shovel.",
-        "tttext":  """Dr. Ost has generously offered to trade 
-        a better shovel for your hard-earned bones. What could
-        he want with them? Research, perhaps.""",
+        "tttext":  "Dr. Ost has generously offered to trade " +
+                   "a better shovel for your hard-earned bones. " +
+                   "What could he want with them? Research, perhaps.",
         "cost": {"Bones": 100},
         "target": "Shovel1",
         "oneTime": True

@@ -2,6 +2,7 @@
 from tkinter import *
 from objects import *
 import constants as c
+import text
 
 
 
@@ -86,6 +87,8 @@ class CutsceneManager:
     def __init__(self, root):
         self.root = root
         self.cutscenes = {}
+        for key in text.csEvents.keys():
+            self._createCutscene(key, text.csEvents[key])
         self.active = None
     
     def _createCutscene(self, csTitle, csText):
@@ -151,7 +154,7 @@ class ActionManager:
         for tab in self._createTabs():
             self._addTab(tab)
         self._addToFrame(0)
-        self._addToFrame(1)
+        #self._addToFrame(1)
         self._changeTab(0)
     
     def _addTab(self, tab):
@@ -226,6 +229,36 @@ class UpgradeManager:
         currentMult = resource._getMult(src)
         newMult = currentMult + mult
         resource._setMult(newMult, src)
+
+class FlagManager:
+    def __init__(self, rsm, csm, afm, ugm, lm):
+        self.rsm = rsm
+        self.csm = csm
+        self.afm = afm
+        self.ugm = ugm
+        self.lm = lm
+        self.flags = {"start": False}
+        self.triggers = {"start": False}
+    
+    def _checkTriggers(self):
+        for trigger in self.triggers.keys():
+            match trigger:
+                case "start":
+                    if not self.flags["start"]:
+                        self.triggers["start"] = True
+        
+        for trigger in self.triggers.keys():
+            if self.triggers[trigger]:
+                self._resolveTriggers(trigger)
+
+    def _resolveTriggers(self, trigger):
+        match trigger:
+            case "start":
+                self.csm._activateCutscene('Introduction')
+        self.triggers[trigger] = False
+        self.flags[trigger] = True
+        
+
 
 
 

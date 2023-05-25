@@ -9,8 +9,6 @@ import constants as const
 
 game = utils.Gui()
 
-game.csm._activateCutscene('Introduction')
-
 while game.running:
     game.root.update_idletasks()
     game._updateGui()

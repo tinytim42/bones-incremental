@@ -9,11 +9,11 @@ class Gui:
         self.root = Tk()
         self.rsm = ResourceManager(self.root)
         self.csm = CutsceneManager(self.root)
-        for key in text.csEvents.keys():
-            self.csm._createCutscene(key, text.csEvents[key])
         self.lm = LogManager(self.root)
         self.ugm = UpgradeManager(self.root, self.rsm)
         self.afm = ActionManager(self.root, self.rsm, self.ugm)
+        self.fm = FlagManager(self.rsm, self.csm, self.afm,
+                              self.ugm, self.lm)
         self.root.title("Bones Incremental")
         self.root.configure(background="black")
         self.root.minsize(c.SCREEN_SIZE[0], c.SCREEN_SIZE[1])
@@ -56,6 +56,7 @@ class Gui:
         for b in btns:
             if b.__class__.__name__ == "BuyBtn":
                 b._setBuyable()
+        self.fm._checkTriggers()
 
 if __name__ == "__main__":
     game = Gui()
