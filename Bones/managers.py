@@ -187,21 +187,18 @@ class ActionManager:
         bonesBtn = Btn(graveyard.frame, btns["Bones"])
         bonesBtn.bind("<Button-1>", 
                       lambda e:self.rsm._gather("Bones", "Click"))
-        graveyard._addContent(bonesBtn, 0, 0)
-        graveyard._addToFrame(0)
-
+        graveyard._addContent(bonesBtn, "bonesBtn", 0, 0)
+        graveyard._addToFrame("bonesBtn")
         turnipBtn = BuyBtn(graveyard.frame, self, buyBtns["Turnip"])
-        #turnipBtn.bind("<Button-1>", lambda e:turnipBtn._buy())
-        graveyard._addContent(turnipBtn, 0, 1)
-        graveyard._addToFrame(1)
+        graveyard._addContent(turnipBtn, "turnipBtn", 0, 1)
+        #graveyard._addToFrame("turnipBtn")
         tabList.append(graveyard)
         town = Tab("Town")
         town.frame.grid_columnconfigure(0, weight=1)
         town.frame.grid_columnconfigure(1, weight=1)
         shovel1Btn = BuyBtn(town.frame, self, buyBtns["Shovel1"])
-        #shovel1Btn.bind("<Button-1>", lambda e:shovel1Btn._buy())
-        town._addContent(shovel1Btn, 0, 0)
-        town._addToFrame(0)
+        town._addContent(shovel1Btn, "shovel1Btn", 0, 0)
+        town._addToFrame("shovel1Btn")
         tabList.append(town)
         return tabList
 
@@ -237,24 +234,48 @@ class FlagManager:
         self.afm = afm
         self.ugm = ugm
         self.lm = lm
-        self.flags = {"start": False}
-        self.triggers = {"start": False}
+        self.flags = {"START": False,
+                      "UNLOCK_TURNIP": False}
+        self.triggers = {"START": False,
+                         "UNLOCK_TURNIP": False}
     
     def _checkTriggers(self):
         for trigger in self.triggers.keys():
+            unlock = True
+            resources = {}
+            flags = []
             match trigger:
-                case "start":
-                    if not self.flags["start"]:
-                        self.triggers["start"] = True
-        
+                case "START":
+                    if self.flags["START"]:
+                        unlock = False
+                case "UNLOCK_TURNIP":
+                    resources["Bones"] = 10
+                    flags.append('START')
+            #checks resources for unlock amount
+            if len(resources.keys()) > 0:
+                for r in resources.keys():
+                    if self.rsm.resources[r]._getAmt() < resources[r]:
+                        unlock = False
+            #checks if all flag requirements are met
+            if len(flags) > 0:
+                for flag in flags:
+                    if not self.flags[flag]:
+                        unlock = False
+            
+            if unlock:
+                self.triggers[trigger] = True
+
         for trigger in self.triggers.keys():
             if self.triggers[trigger]:
                 self._resolveTriggers(trigger)
 
     def _resolveTriggers(self, trigger):
         match trigger:
-            case "start":
+            case "START":
                 self.csm._activateCutscene('Introduction')
+            case "UNLOCK_TURNIP":
+                self.afm.tabs[0]._addToFrame("turnipBtn")
+
         self.triggers[trigger] = False
         self.flags[trigger] = True
         
@@ -265,7 +286,8 @@ class FlagManager:
 if __name__ == "__main__":
     root = Tk()
     rsm = ResourceManager(root)
+    ugm = UpgradeManager(root, rsm)
     lm = LogManager(root)
-    afm = ActionManager(root, rsm)
+    afm = ActionManager(root, rsm, ugm)
 
 

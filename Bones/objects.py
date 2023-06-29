@@ -245,13 +245,13 @@ class Tab:
         self.btn = None
         self.active = False
         #2D list [widget, row, column]
-        self.contents = []
+        self.contents = {}
     
-    def _addContent(self, widget, row, col):
-        self.contents.append([widget, row, col])
+    def _addContent(self, widget, name, row, col):
+        self.contents[name] = (widget, row, col)
     
-    def _addToFrame(self, widgetIndex):
-        content = self.contents[widgetIndex]
+    def _addToFrame(self, widgetName):
+        content = self.contents[widgetName]
         content[0].grid(in_=self.frame,
                         row=content[1],
                         column=content[2],
